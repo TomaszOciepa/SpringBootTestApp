@@ -1,11 +1,9 @@
-package pl.tom.springboottestapp.model;
+package pl.tom.springboottestapp.databaseExample;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "MyCar")
 public class Car {
 
     public Car() {
@@ -22,7 +20,12 @@ public class Car {
     private Long id;
 
     private String mark;
+    // @Transient - powoduje że to pole nie zostanie zapisane w bazie danych
+//    @Transient
     private String model;
+
+    // @Enumerated(EnumType.STRING) - zapisuje enum jako string (domyślnie jest to liczba)
+    @Enumerated(EnumType.STRING)
     private Color color;
 
     public Long getId() {
