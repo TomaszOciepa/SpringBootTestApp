@@ -2,6 +2,7 @@ package pl.tom.springboottestapp.securityExample;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
@@ -13,11 +14,11 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
-    public UserDetailsService userDetailsService(){
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
+    public UserDetailsService userDetailsService() {
+        UserDetails moderator = User.withDefaultPasswordEncoder()
+                .username("moderator")
                 .password("user1")
-                .roles("USER")
+                .roles("MODERATOR")
                 .build();
 
         UserDetails admin = User.withDefaultPasswordEncoder()
@@ -27,17 +28,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .build();
 
 
-        return new InMemoryUserDetailsManager(user, admin);
+        return new InMemoryUserDetailsManager(moderator, admin);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/hello").permitAll()
+        //httpBasic() - pozwala na logowanie za pomocą loginu i hasła
+        // csrf().disable() - wyłącza domyślne włączoną ochrone przed csrf
+
+        http.httpBasic().and().authorizeRequests()
+                .antMatchers(HttpMethod.GET, "/api").permitAll()
+                .antMatchers(HttpMethod.POST, "/api").hasAnyRole("MODERATOR", "ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api").hasRole("ADMIN")
                 .anyRequest().hasRole("ADMIN")
                 .and()
                 .formLogin().permitAll()
                 .and()
-                .logout().permitAll();
+                .logout().permitAll()
+                .and()
+                .csrf().disable();
     }
 }
