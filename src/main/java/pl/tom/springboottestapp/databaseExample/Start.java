@@ -28,8 +28,8 @@ public class Start {
 
         carRepo.deleteById(1L);
 
-        Iterable<Car> all = carRepo.findAll();
-
+//        Iterable<Car> all = carRepo.findAll();
+        Iterable<Car> all = carRepo.findAllByColor(Color.BLUE);
         all.forEach(System.out::println);
     }
 }
